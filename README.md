@@ -13,7 +13,7 @@
 
 <br/>
 
-[**⬇ Download for Mac**](https://github.com/jasonr1902/Youtube-Channel-Tracker/releases/latest/download/YouTube-Channel-Tracker-0.1.0-arm64.dmg)
+[**⬇ Download for Mac**](https://github.com/jasonr1902/Youtube-Channel-Tracker/releases/latest)
 
 > Requires macOS · Apple Silicon (M1 or later)
 
@@ -42,7 +42,7 @@ YouTube Channel Tracker replaces spreadsheets and sticky notes with a purpose-bu
 
 ### Step 1 — Download
 
-[**Download YouTube-Channel-Tracker-0.1.0-arm64.dmg**](https://github.com/jasonr1902/Youtube-Channel-Tracker/releases/latest/download/YouTube-Channel-Tracker-0.1.0-arm64.dmg)
+[**Download the latest DMG from GitHub Releases**](https://github.com/jasonr1902/Youtube-Channel-Tracker/releases/latest)
 
 ### Step 2 — Install
 
