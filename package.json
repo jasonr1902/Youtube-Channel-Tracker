@@ -1,0 +1,86 @@
+{
+  "name": "youtube-channel-tracker",
+  "version": "0.1.0",
+  "description": "Organize, schedule, and track your YouTube channel production pipeline",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "ELECTRON_RUN_AS_NODE= electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "ELECTRON_RUN_AS_NODE= electron-vite preview",
+    "package": "electron-vite build && electron-builder",
+    "release": "electron-vite build && GH_TOKEN=$GH_TOKEN electron-builder --publish always",
+    "postinstall": "ELECTRON_RUN_AS_NODE= electron-rebuild -f -w better-sqlite3 --arch arm64"
+  },
+  "dependencies": {
+    "@electron-toolkit/preload": "^3.0.0",
+    "better-sqlite3": "^11.0.0",
+    "electron-store": "^10.0.0",
+    "electron-updater": "^6.8.9",
+    "googleapis": "^173.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^3.9.0"
+  },
+  "devDependencies": {
+    "@electron-toolkit/tsconfig": "^2.0.0",
+    "@electron/rebuild": "^4.0.4",
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.19",
+    "electron": "^31.1.0",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^2.3.0",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.5.2",
+    "vite": "^5.3.1"
+  },
+  "build": {
+    "appId": "com.youtubetracker.app",
+    "productName": "YouTube Channel Tracker",
+    "copyright": "Copyright © 2026",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "out/**/*",
+      "!out/**/*.map"
+    ],
+    "asarUnpack": [
+      "**/node_modules/better-sqlite3/**",
+      "**/*.node"
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "jasonr1902",
+      "repo": "Youtube-Channel-Tracker",
+      "releaseType": "release"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "resources/icon.icns",
+      "target": [
+        { "target": "dmg", "arch": ["arm64"] },
+        { "target": "zip", "arch": ["arm64"] }
+      ]
+    },
+    "dmg": {
+      "title": "YouTube Channel Tracker",
+      "contents": [
+        {
+          "x": 410,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 130,
+          "y": 150,
+          "type": "file"
+        }
+      ]
+    }
+  }
+}
