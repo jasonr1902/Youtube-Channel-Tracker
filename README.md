@@ -136,6 +136,16 @@ Built with [Electron](https://electronjs.org) · [React](https://react.dev) · [
 
 ---
 
+## Support
+
+If this app saves you time, a coffee goes a long way 🙏
+
+<a href="https://ko-fi.com/jasonr1902">
+  <img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi" />
+</a>
+
+---
+
 <div align="center">
 <sub>Made for creators who want to stay organized without leaving their Mac.</sub>
 </div>
