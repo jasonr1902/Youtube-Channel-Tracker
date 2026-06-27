@@ -3,7 +3,9 @@ import type {
   VideoCreate, VideoUpdate,
   SeriesCreate, SeriesUpdate,
   GoalCreate, GoalUpdate,
-  QueueItemCreate, QueueItem, StageEvent, UploadProgressEvent
+  QueueItemCreate, QueueItem, StageEvent, UploadProgressEvent,
+  UserProfile, LevelHistoryEntry, Reward, Account,
+  ProductionStats
 } from '../shared/types'
 
 const api = {
@@ -68,6 +70,8 @@ const api = {
       properties?: string[]
     }): Promise<{ canceled: boolean; filePaths: string[] }> =>
       ipcRenderer.invoke('dialog:openFile', options),
+    openFolder: (): Promise<{ canceled: boolean; filePaths: string[] }> =>
+      ipcRenderer.invoke('dialog:openFolder'),
     saveFile: (options: {
       title?: string
       defaultPath?: string
@@ -75,9 +79,29 @@ const api = {
     }): Promise<{ canceled: boolean; filePath?: string }> =>
       ipcRenderer.invoke('dialog:saveFile', options)
   },
+  shell: {
+    openPath: (path: string): Promise<string> => ipcRenderer.invoke('shell:openPath', path)
+  },
   export: {
     channelReport: (): Promise<{ saved: boolean; path?: string }> =>
       ipcRenderer.invoke('export:channelReport')
+  },
+  accounts: {
+    getAll:    (): Promise<Account[]> => ipcRenderer.invoke('accounts:getAll'),
+    getActive: (): Promise<string>    => ipcRenderer.invoke('accounts:getActive'),
+    create:    (name: string): Promise<Account> => ipcRenderer.invoke('accounts:create', name),
+    rename:    (id: string, name: string): Promise<Account[]> => ipcRenderer.invoke('accounts:rename', id, name),
+    delete:    (id: string): Promise<Account[]> => ipcRenderer.invoke('accounts:delete', id),
+    switch:    (id: string): Promise<void> => ipcRenderer.invoke('accounts:switch', id)
+  },
+  profile: {
+    get:            (): Promise<UserProfile> => ipcRenderer.invoke('profile:get'),
+    getLevelHistory:(): Promise<LevelHistoryEntry[]> => ipcRenderer.invoke('profile:getLevelHistory'),
+    getRewards:     (): Promise<Reward[]> => ipcRenderer.invoke('profile:getRewards'),
+    getStats:       (): Promise<{ ideasAdded: number }> => ipcRenderer.invoke('profile:getStats')
+  },
+  productionAnalytics: {
+    getStats: (): Promise<ProductionStats> => ipcRenderer.invoke('productionAnalytics:getStats')
   },
   update: {
     install: (): Promise<void> => ipcRenderer.invoke('update:install'),

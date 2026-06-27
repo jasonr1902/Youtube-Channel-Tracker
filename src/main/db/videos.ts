@@ -1,4 +1,5 @@
 import { getDb } from './database'
+import { awardXpForNewIdea, awardXpForStageChange } from './steps'
 import type { Video, VideoCreate, VideoUpdate } from '../../shared/types'
 
 export function getAllVideos(): Video[] {
@@ -16,9 +17,10 @@ export function getVideo(id: number): Video | undefined {
 export function createVideo(data: VideoCreate): Video {
   const db = getDb()
   const result = db.prepare(`
-    INSERT INTO videos (title, description, tags, thumbnail_concept, priority, stage, series_id, episode_order, scheduled_date, notes, youtube_video_id, thumbnail_path, archived)
-    VALUES (@title, @description, @tags, @thumbnail_concept, @priority, @stage, @series_id, @episode_order, @scheduled_date, @notes, @youtube_video_id, @thumbnail_path, @archived)
-  `).run({ youtube_video_id: null, thumbnail_path: null, archived: 0, ...data })
+    INSERT INTO videos (title, description, tags, thumbnail_concept, priority, stage, series_id, episode_order, scheduled_date, notes, youtube_video_id, thumbnail_path, archived, script_path, script_word_count, script_draft_quality, assets_folder_path)
+    VALUES (@title, @description, @tags, @thumbnail_concept, @priority, @stage, @series_id, @episode_order, @scheduled_date, @notes, @youtube_video_id, @thumbnail_path, @archived, @script_path, @script_word_count, @script_draft_quality, @assets_folder_path)
+  `).run({ youtube_video_id: null, thumbnail_path: null, archived: 0, script_path: null, script_word_count: null, script_draft_quality: null, assets_folder_path: null, ...data })
+  try { awardXpForNewIdea() } catch {}
   return getVideo(result.lastInsertRowid as number)!
 }
 
@@ -35,9 +37,16 @@ export function updateVideo(data: VideoUpdate): Video {
       stage = @stage, series_id = @series_id, episode_order = @episode_order,
       scheduled_date = @scheduled_date, notes = @notes,
       youtube_video_id = @youtube_video_id, thumbnail_path = @thumbnail_path,
-      archived = @archived
+      archived = @archived,
+      script_path = @script_path, script_word_count = @script_word_count,
+      script_draft_quality = @script_draft_quality, assets_folder_path = @assets_folder_path
     WHERE id = @id
   `).run(merged)
+
+  if (data.stage && data.stage !== current.stage) {
+    try { awardXpForStageChange(current.stage, data.stage) } catch {}
+  }
+
   return getVideo(data.id)!
 }
 

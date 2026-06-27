@@ -84,8 +84,8 @@ export async function syncChannelVideos(): Promise<SyncResult> {
       } else {
         // Create new card in Published stage
         db.prepare(`
-          INSERT INTO videos (title, description, stage, youtube_video_id, scheduled_date)
-          VALUES (?, ?, 'published', ?, ?)
+          INSERT INTO videos (title, description, stage, youtube_video_id, scheduled_date, archived)
+          VALUES (?, ?, 'published', ?, ?, 1)
         `).run(
           meta.title,
           meta.description.slice(0, 500),

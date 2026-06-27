@@ -1,21 +1,27 @@
 import Database from 'better-sqlite3'
-import { app } from 'electron'
-import { join } from 'path'
 import { mkdirSync } from 'fs'
+import { dirname } from 'path'
+import { getActiveAccountId, getAccountDbPath } from './accounts'
 
-let db: Database.Database
+let db: Database.Database | undefined
 
 export function getDb(): Database.Database {
   if (!db) {
-    const userDataPath = app.getPath('userData')
-    mkdirSync(userDataPath, { recursive: true })
-    const dbPath = join(userDataPath, 'tracker.db')
+    const dbPath = getAccountDbPath(getActiveAccountId())
+    mkdirSync(dirname(dbPath), { recursive: true })
     db = new Database(dbPath)
     db.pragma('journal_mode = WAL')
     db.pragma('foreign_keys = ON')
     migrate(db)
   }
   return db
+}
+
+export function closeDb(): void {
+  if (db) {
+    try { db.close() } catch {}
+    db = undefined
+  }
 }
 
 const PHASE5_TRIGGER = `
@@ -84,6 +90,10 @@ function migrate(db: Database.Database): void {
         youtube_video_id  TEXT,
         thumbnail_path    TEXT,
         archived          INTEGER NOT NULL DEFAULT 0,
+        script_path       TEXT,
+        script_word_count INTEGER,
+        script_draft_quality TEXT,
+        assets_folder_path TEXT,
         created_at        TEXT NOT NULL DEFAULT (datetime('now')),
         updated_at        TEXT NOT NULL DEFAULT (datetime('now'))
       );
@@ -128,7 +138,12 @@ function migrate(db: Database.Database): void {
     `)
     db.exec(PHASE4_TABLES)
     db.exec(PHASE5_TRIGGER)
-    db.pragma('user_version = 5')
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_path TEXT`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_word_count INTEGER`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_draft_quality TEXT`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN assets_folder_path TEXT`) } catch {}
+    db.pragma('user_version = 6')
+    migrateToV7(db)
   }
 
   // Users starting from Phase 1 (version 0) already have base tables.
@@ -161,7 +176,12 @@ function migrate(db: Database.Database): void {
     db.exec(PHASE4_TABLES)
     db.exec(PHASE5_TRIGGER)
     seedStageHistory(db)
-    db.pragma('user_version = 5')
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_path TEXT`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_word_count INTEGER`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_draft_quality TEXT`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN assets_folder_path TEXT`) } catch {}
+    db.pragma('user_version = 6')
+    migrateToV7(db)
   }
 
   // Users who ran through Phase 2 (version 2) need Phase 3 + 4 additions.
@@ -185,7 +205,12 @@ function migrate(db: Database.Database): void {
     db.exec(PHASE4_TABLES)
     db.exec(PHASE5_TRIGGER)
     seedStageHistory(db)
-    db.pragma('user_version = 5')
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_path TEXT`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_word_count INTEGER`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_draft_quality TEXT`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN assets_folder_path TEXT`) } catch {}
+    db.pragma('user_version = 6')
+    migrateToV7(db)
   }
 
   // Users on Phase 3 (version 3) need Phase 4 + 5 tables.
@@ -195,20 +220,116 @@ function migrate(db: Database.Database): void {
     db.exec(PHASE4_TABLES)
     db.exec(PHASE5_TRIGGER)
     seedStageHistory(db)
-    db.pragma('user_version = 5')
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_path TEXT`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_word_count INTEGER`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_draft_quality TEXT`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN assets_folder_path TEXT`) } catch {}
+    db.pragma('user_version = 6')
+    migrateToV7(db)
   }
 
-  // v5: archived flag + initial-stage history trigger
+  // v4: archived flag + initial-stage history trigger
   if (version === 4) {
     try { db.exec(`ALTER TABLE videos ADD COLUMN archived INTEGER NOT NULL DEFAULT 0`) } catch {}
     db.exec(PHASE5_TRIGGER)
-    db.pragma('user_version = 5')
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_path TEXT`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_word_count INTEGER`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_draft_quality TEXT`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN assets_folder_path TEXT`) } catch {}
+    db.pragma('user_version = 6')
+    migrateToV7(db)
+  }
+
+  // v5→v7: script attachment + assets folder + gamification
+  if (version === 5) {
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_path TEXT`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_word_count INTEGER`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN script_draft_quality TEXT`) } catch {}
+    try { db.exec(`ALTER TABLE videos ADD COLUMN assets_folder_path TEXT`) } catch {}
+    db.pragma('user_version = 6')
+    migrateToV7(db)
+  }
+
+  // v7: gamification tables
+  if (version === 6) {
+    migrateToV7(db)
+  }
+
+  // v8: analytics XP credit tracking
+  if (version === 7) {
+    migrateToV8(db)
   }
 
   // On every startup: reset any stuck 'uploading' items back to 'queued'
   try {
     db.prepare("UPDATE publish_queue SET status = 'queued', progress = 0 WHERE status = 'uploading'").run()
   } catch {}
+}
+
+function migrateToV8(db: Database.Database): void {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS xp_analytics_credits (
+      id                INTEGER PRIMARY KEY CHECK (id = 1),
+      views_credited    INTEGER NOT NULL DEFAULT 0,
+      comments_credited INTEGER NOT NULL DEFAULT 0,
+      subs_credited     INTEGER NOT NULL DEFAULT 0
+    );
+    INSERT OR IGNORE INTO xp_analytics_credits (id, views_credited, comments_credited, subs_credited) VALUES (1,0,0,0);
+  `)
+  db.pragma('user_version = 8')
+}
+
+function migrateToV7(db: Database.Database): void {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS idea_steps (
+      id           INTEGER PRIMARY KEY AUTOINCREMENT,
+      idea_id      INTEGER NOT NULL REFERENCES videos(id) ON DELETE CASCADE,
+      title        TEXT NOT NULL,
+      position     INTEGER NOT NULL DEFAULT 0,
+      completed_at TEXT
+    );
+    CREATE TABLE IF NOT EXISTS idea_steps_sub (
+      id           INTEGER PRIMARY KEY AUTOINCREMENT,
+      step_id      INTEGER NOT NULL REFERENCES idea_steps(id) ON DELETE CASCADE,
+      title        TEXT NOT NULL,
+      position     INTEGER NOT NULL DEFAULT 0,
+      completed_at TEXT
+    );
+    CREATE TABLE IF NOT EXISTS user_profile (
+      id              INTEGER PRIMARY KEY,
+      current_xp      INTEGER NOT NULL DEFAULT 0,
+      current_level   INTEGER NOT NULL DEFAULT 0,
+      total_xp_earned INTEGER NOT NULL DEFAULT 0
+    );
+    INSERT OR IGNORE INTO user_profile (id, current_xp, current_level, total_xp_earned) VALUES (1,0,0,0);
+    CREATE TABLE IF NOT EXISTS level_history (
+      id                INTEGER PRIMARY KEY AUTOINCREMENT,
+      level             INTEGER NOT NULL,
+      achieved_at       TEXT NOT NULL DEFAULT (datetime('now')),
+      xp_at_achievement INTEGER NOT NULL DEFAULT 0
+    );
+    CREATE TABLE IF NOT EXISTS rewards (
+      id               INTEGER PRIMARY KEY AUTOINCREMENT,
+      reward_type      TEXT NOT NULL DEFAULT 'badge',
+      reward_key       TEXT NOT NULL UNIQUE,
+      unlocked_at_level INTEGER NOT NULL,
+      label            TEXT NOT NULL
+    );
+    INSERT OR IGNORE INTO rewards (reward_type, reward_key, unlocked_at_level, label) VALUES
+      ('badge','first_step',1,'First Step'),
+      ('badge','getting_started',5,'Getting Started'),
+      ('badge','rising_creator',10,'Rising Creator'),
+      ('badge','dedicated',25,'Dedicated Creator'),
+      ('badge','machine',50,'Content Machine'),
+      ('badge','legend',100,'Legend');
+    CREATE TABLE IF NOT EXISTS user_unlocks (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      reward_id  INTEGER NOT NULL REFERENCES rewards(id),
+      unlocked_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `)
+  db.pragma('user_version = 7')
+  migrateToV8(db)
 }
 
 // Seed initial stage_history entry for each existing video (one-time, on upgrade)

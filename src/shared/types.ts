@@ -1,3 +1,9 @@
+export interface Account {
+  id: string
+  name: string
+  createdAt: string
+}
+
 export type Stage =
   | 'idea'
   | 'script'
@@ -23,6 +29,10 @@ export interface Video {
   youtube_video_id: string | null
   thumbnail_path: string | null
   archived: 0 | 1
+  script_path: string | null
+  script_word_count: number | null
+  script_draft_quality: 'rough' | 'final' | null
+  assets_folder_path: string | null
   created_at: string
   updated_at: string
 }
@@ -144,4 +154,83 @@ export interface UploadProgressEvent {
   queueItemId: number
   progress: number
   status: UploadStatus
+}
+
+// ─── Gamification ──────────────────────────────────────────────────────────
+
+export interface Substep {
+  id: number
+  step_id: number
+  title: string
+  position: number
+  completed_at: string | null
+}
+
+export interface Step {
+  id: number
+  idea_id: number
+  title: string
+  position: number
+  completed_at: string | null
+  substeps: Substep[]
+}
+
+export interface UserProfile {
+  id: number
+  current_xp: number
+  current_level: number
+  total_xp_earned: number
+}
+
+export interface LevelHistoryEntry {
+  id: number
+  level: number
+  achieved_at: string
+  xp_at_achievement: number
+}
+
+export interface Reward {
+  id: number
+  reward_type: string
+  reward_key: string
+  unlocked_at_level: number
+  label: string
+  unlocked_at: string | null
+}
+
+export interface XPResult {
+  profile: UserProfile
+  leveledUp: boolean
+  newLevel?: number
+  newUnlocks: Reward[]
+}
+
+// ─── Production Analytics ───────────────────────────────────────────────────
+
+export interface StageAvgDays {
+  stage: string
+  avg_days: number
+  transitions: number
+}
+
+export interface FunnelCount {
+  stage: string
+  count: number
+}
+
+export interface VideoTimeStat {
+  id: number
+  title: string
+  days_to_publish: number
+}
+
+export interface ProductionStats {
+  stageAvgDays: StageAvgDays[]
+  funnelCounts: FunnelCount[]
+  totalIdeas: number
+  publishedCount: number
+  conversionRate: number
+  fastestVideos: VideoTimeStat[]
+  slowestVideos: VideoTimeStat[]
+  bottleneck: string | null
 }

@@ -40,10 +40,10 @@ export default function VideoCard({ video, onClick, onDelete, onArchive }: Video
   return (
     <div
       onClick={onClick}
-      className="bg-yt-surface border border-yt-border rounded-xl p-4 hover:border-yt-red/50 cursor-pointer transition-all group"
+      className="bg-yt-surface border border-yt-border rounded-xl hover:border-yt-red/50 cursor-pointer transition-all group flex flex-col max-h-48"
     >
-      {/* Title row */}
-      <div className="flex items-start justify-between gap-2 mb-2">
+      {/* Title row — always visible */}
+      <div className="flex items-start justify-between gap-2 px-4 pt-4 pb-1 flex-shrink-0">
         <div className="flex items-center gap-2 min-w-0">
           <span className={`w-2 h-2 rounded-full flex-shrink-0 mt-0.5 ${dot}`} title={stageLabel[video.stage]} />
           <h3 className="font-medium text-sm text-yt-text leading-snug">{video.title}</h3>
@@ -68,24 +68,33 @@ export default function VideoCard({ video, onClick, onDelete, onArchive }: Video
         </div>
       </div>
 
-      {video.description && (
-        <p className="text-xs text-yt-muted line-clamp-2 mb-2 pl-4">{video.description}</p>
-      )}
+      {/* Scrollable body */}
+      <div className="flex-1 overflow-y-auto px-4 min-h-0">
+        {video.description && (
+          <p className="text-xs text-yt-muted mb-2 pl-4">{video.description}</p>
+        )}
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 pl-4 mb-2">
+            {tags.map(tag => (
+              <span key={tag} className="text-xs bg-yt-elevated text-yt-muted/80 px-2 py-0.5 rounded">
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
 
-      {tags.length > 0 && (
-        <div className="flex flex-wrap gap-1 pl-4 mb-2">
-          {tags.slice(0, 4).map(tag => (
-            <span key={tag} className="text-xs bg-yt-elevated text-yt-muted/80 px-2 py-0.5 rounded">
-              #{tag}
-            </span>
-          ))}
-          {tags.length > 4 && <span className="text-xs text-yt-muted">+{tags.length - 4}</span>}
+      {/* Footer — always visible */}
+      <div className="flex items-center justify-between px-4 pb-3 pt-1 flex-shrink-0">
+        <div className="flex items-center gap-2 pl-4">
+          <span className="text-xs text-yt-muted">{stageLabel[video.stage]}</span>
+          {video.script_path && (
+            <span className="text-xs text-yt-muted/60" title="Script attached">📄</span>
+          )}
+          {video.assets_folder_path && (
+            <span className="text-xs text-yt-muted/60" title="Assets folder linked">📁</span>
+          )}
         </div>
-      )}
-
-      {/* Footer row: stage label + priority badge + date */}
-      <div className="flex items-center justify-between pl-4 mt-1">
-        <span className="text-xs text-yt-muted">{stageLabel[video.stage]}</span>
         <div className="flex items-center gap-2">
           <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${badge.className}`}>
             {badge.text}

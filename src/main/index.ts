@@ -8,6 +8,9 @@ import { registerAuthHandlers } from './ipc/authHandlers'
 import { registerYouTubeHandlers } from './ipc/youtubeHandlers'
 import { registerUploadHandlers } from './ipc/uploadHandlers'
 import { registerUpdateHandlers } from './ipc/updateHandlers'
+import { registerStepHandlers } from './ipc/stepHandlers'
+import { registerAccountHandlers } from './ipc/accountHandlers'
+import { registerProductionAnalyticsHandlers } from './ipc/productionAnalyticsHandlers'
 import { startScheduler } from './services/upload'
 import { autoUpdater } from 'electron-updater'
 
@@ -58,6 +61,9 @@ app.whenReady().then(() => {
   registerYouTubeHandlers()
   registerUploadHandlers()
   registerUpdateHandlers()
+  registerStepHandlers()
+  registerAccountHandlers()
+  registerProductionAnalyticsHandlers()
   startScheduler()
   createWindow()
 

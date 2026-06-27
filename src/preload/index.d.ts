@@ -3,7 +3,9 @@ import type {
   Series, SeriesCreate, SeriesUpdate,
   Goal, GoalCreate, GoalUpdate,
   AuthState, SyncResult, VideoStats, DailyMetric, ChannelStats,
-  QueueItem, QueueItemCreate, StageEvent, UploadProgressEvent
+  QueueItem, QueueItemCreate, StageEvent, UploadProgressEvent,
+  UserProfile, LevelHistoryEntry, Reward, Account,
+  ProductionStats
 } from '../shared/types'
 
 declare global {
@@ -61,14 +63,35 @@ declare global {
           filters?: { name: string; extensions: string[] }[]
           properties?: string[]
         }) => Promise<{ canceled: boolean; filePaths: string[] }>
+        openFolder: () => Promise<{ canceled: boolean; filePaths: string[] }>
         saveFile: (options: {
           title?: string
           defaultPath?: string
           filters?: { name: string; extensions: string[] }[]
         }) => Promise<{ canceled: boolean; filePath?: string }>
       }
+      shell: {
+        openPath: (path: string) => Promise<string>
+      }
       export: {
         channelReport: () => Promise<{ saved: boolean; path?: string }>
+      }
+      accounts: {
+        getAll:    () => Promise<Account[]>
+        getActive: () => Promise<string>
+        create:    (name: string) => Promise<Account>
+        rename:    (id: string, name: string) => Promise<Account[]>
+        delete:    (id: string) => Promise<Account[]>
+        switch:    (id: string) => Promise<void>
+      }
+      profile: {
+        get:             () => Promise<UserProfile>
+        getLevelHistory: () => Promise<LevelHistoryEntry[]>
+        getRewards:      () => Promise<Reward[]>
+        getStats:        () => Promise<{ ideasAdded: number }>
+      }
+      productionAnalytics: {
+        getStats: () => Promise<ProductionStats>
       }
       update: {
         install: () => Promise<void>

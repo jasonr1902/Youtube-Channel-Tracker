@@ -409,7 +409,7 @@ export default function IdeaVault({ triggerNew }: Props): React.ReactElement {
         </Modal>
       )}
 
-      {/* Edit modal with collapsible timeline */}
+      {/* Edit modal with steps + collapsible timeline */}
       {editing && (
         <Modal title="Edit Idea" onClose={() => setEditing(null)}>
           <VideoForm

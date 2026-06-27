@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Sidebar from './components/Sidebar'
 import UpdateBanner from './components/UpdateBanner'
+import GlobalProgressBar from './components/GlobalProgressBar'
 import IdeaVault from './pages/IdeaVault'
 import Pipeline from './pages/Pipeline'
 import SeriesTracker from './pages/SeriesTracker'
@@ -10,8 +11,10 @@ import ThisWeek from './pages/ThisWeek'
 import AnalyticsPage from './pages/Analytics'
 import SettingsPage from './pages/Settings'
 import PublishQueuePage from './pages/PublishQueue'
+import ProfilePage from './pages/Profile'
+import ProductionAnalyticsPage from './pages/ProductionAnalytics'
 
-export type Page = 'thisweek' | 'ideas' | 'pipeline' | 'series' | 'calendar' | 'goals' | 'analytics' | 'queue' | 'settings'
+export type Page = 'thisweek' | 'ideas' | 'pipeline' | 'series' | 'calendar' | 'goals' | 'analytics' | 'production' | 'queue' | 'settings' | 'profile'
 
 export default function App(): React.ReactElement {
   const [currentPage, setCurrentPage] = useState<Page>('thisweek')
@@ -33,18 +36,23 @@ export default function App(): React.ReactElement {
     <div className="flex flex-col h-full bg-yt-dark text-yt-text">
       <UpdateBanner />
       <div className="flex flex-1 overflow-hidden">
-      <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
-      <main className="flex-1 overflow-hidden">
-        {currentPage === 'thisweek'  && <ThisWeek />}
-        {currentPage === 'ideas'     && <IdeaVault triggerNew={triggerNew} />}
-        {currentPage === 'pipeline'  && <Pipeline triggerNew={triggerNew} />}
-        {currentPage === 'series'    && <SeriesTracker triggerNew={triggerNew} />}
-        {currentPage === 'calendar'  && <CalendarPage triggerNew={triggerNew} />}
-        {currentPage === 'goals'     && <GoalsPage triggerNew={triggerNew} />}
-        {currentPage === 'analytics' && <AnalyticsPage />}
-        {currentPage === 'queue'     && <PublishQueuePage />}
-        {currentPage === 'settings'  && <SettingsPage />}
-      </main>
+        <div className="flex flex-col w-56 flex-shrink-0">
+          <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
+          <GlobalProgressBar />
+        </div>
+        <main className="flex-1 overflow-hidden">
+          {currentPage === 'thisweek'  && <ThisWeek />}
+          {currentPage === 'ideas'     && <IdeaVault triggerNew={triggerNew} />}
+          {currentPage === 'pipeline'  && <Pipeline triggerNew={triggerNew} />}
+          {currentPage === 'series'    && <SeriesTracker triggerNew={triggerNew} />}
+          {currentPage === 'calendar'  && <CalendarPage triggerNew={triggerNew} />}
+          {currentPage === 'goals'     && <GoalsPage triggerNew={triggerNew} />}
+          {currentPage === 'analytics'   && <AnalyticsPage />}
+          {currentPage === 'production'  && <ProductionAnalyticsPage />}
+          {currentPage === 'queue'     && <PublishQueuePage />}
+          {currentPage === 'settings'  && <SettingsPage />}
+          {currentPage === 'profile'   && <ProfilePage />}
+        </main>
       </div>
     </div>
   )

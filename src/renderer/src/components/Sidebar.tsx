@@ -1,5 +1,6 @@
 import React from 'react'
 import type { Page } from '../App'
+import AccountSwitcher from './AccountSwitcher'
 
 interface SidebarProps {
   currentPage: Page
@@ -7,17 +8,19 @@ interface SidebarProps {
 }
 
 const mainNav: { id: Page; label: string; icon: string }[] = [
-  { id: 'thisweek',  label: 'This Week',   icon: '📋' },
+  { id: 'thisweek',  label: 'Dashboard',   icon: '🏠' },
   { id: 'ideas',     label: 'Idea Vault',  icon: '💡' },
   { id: 'pipeline',  label: 'Pipeline',    icon: '🎬' },
   { id: 'series',    label: 'Series',      icon: '📚' },
   { id: 'calendar',  label: 'Calendar',    icon: '📅' },
-  { id: 'goals',     label: 'Goals',       icon: '🎯' },
-  { id: 'queue',     label: 'Publish Queue', icon: '📤' }
+  { id: 'goals',      label: 'Goals',        icon: '🎯' },
+  { id: 'production', label: 'Production',   icon: '📈' },
+  { id: 'queue',      label: 'Publish Queue', icon: '📤' }
 ]
 
 const bottomNav: { id: Page; label: string; icon: string }[] = [
   { id: 'analytics', label: 'Analytics',  icon: '📊' },
+  { id: 'profile',   label: 'Profile',    icon: '🏅' },
   { id: 'settings',  label: 'Settings',   icon: '⚙️' }
 ]
 
@@ -40,9 +43,9 @@ function NavButton({ item, active, onClick }: { item: { id: Page; label: string;
 
 export default function Sidebar({ currentPage, onNavigate }: SidebarProps): React.ReactElement {
   return (
-    <aside className="w-56 bg-yt-surface border-r border-yt-border flex flex-col flex-shrink-0">
-      <div className="px-4 pt-10 pb-5">
-        <div className="flex items-center gap-2">
+    <aside className="flex-1 bg-yt-surface border-r border-yt-border flex flex-col overflow-hidden">
+      <div className="px-4 pt-10 pb-5" style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}>
+        <div className="flex items-center gap-2" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
           <span className="text-yt-red text-lg font-bold">▶</span>
           <div>
             <div className="font-semibold text-sm text-yt-text leading-none">YT Tracker</div>
@@ -50,6 +53,8 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps): Reac
           </div>
         </div>
       </div>
+
+      <AccountSwitcher />
 
       <nav className="flex-1 px-2 space-y-0.5">
         {mainNav.map(item => (

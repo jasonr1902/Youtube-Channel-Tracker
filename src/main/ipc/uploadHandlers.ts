@@ -1,4 +1,4 @@
-import { ipcMain, dialog } from 'electron'
+import { ipcMain, dialog, shell } from 'electron'
 import { writeFileSync } from 'fs'
 import { getAllQueueItems, addToQueue, removeQueueItem, executeUpload, getStageHistory } from '../services/upload'
 import { getDb } from '../db/database'
@@ -22,9 +22,15 @@ export function registerUploadHandlers(): void {
     return dialog.showOpenDialog(options)
   })
 
+  ipcMain.handle('dialog:openFolder', async () => {
+    return dialog.showOpenDialog({ properties: ['openDirectory'] })
+  })
+
   ipcMain.handle('dialog:saveFile', async (_e, options: Electron.SaveDialogOptions) => {
     return dialog.showSaveDialog(options)
   })
+
+  ipcMain.handle('shell:openPath', (_e, path: string) => shell.openPath(path))
 
   ipcMain.handle('export:channelReport', async () => {
     const result = await dialog.showSaveDialog({

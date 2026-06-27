@@ -13,7 +13,9 @@
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
+    "@types/canvas-confetti": "^1.9.0",
     "better-sqlite3": "^11.0.0",
+    "canvas-confetti": "^1.9.4",
     "electron-store": "^10.0.0",
     "electron-updater": "^6.8.9",
     "googleapis": "^173.0.0",
@@ -63,8 +65,18 @@
       "icon": "resources/icon.icns",
       "identity": "-",
       "target": [
-        { "target": "dmg", "arch": ["arm64"] },
-        { "target": "zip", "arch": ["arm64"] }
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64"
+          ]
+        }
       ]
     },
     "dmg": {
