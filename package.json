@@ -1,6 +1,6 @@
 {
   "name": "youtube-channel-tracker",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Organize, schedule, and track your YouTube channel production pipeline",
   "main": "./out/main/index.js",
   "scripts": {
@@ -61,7 +61,7 @@
     "mac": {
       "category": "public.app-category.productivity",
       "icon": "resources/icon.icns",
-      "identity": null,
+      "identity": "-",
       "target": [
         { "target": "dmg", "arch": ["arm64"] },
         { "target": "zip", "arch": ["arm64"] }
