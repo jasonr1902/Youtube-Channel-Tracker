@@ -52,11 +52,24 @@ YouTube Channel Tracker replaces spreadsheets and sticky notes with a purpose-bu
 
 ### Step 3 — First launch (macOS security)
 
-Because the app isn't notarized by Apple, macOS will warn you on first open. This is normal for indie apps.
+Because the app isn't notarized by Apple, macOS Sonoma/Sequoia will block it on first open. This is a Gatekeeper restriction — the app is safe. Use one of these two methods:
 
-1. **Right-click** the app in Applications and choose **Open**
-2. Click **Open** in the dialog that appears
-3. You only need to do this once — after that it opens normally
+**Option A — Terminal (fastest)**
+
+```bash
+xattr -cr "/Applications/YouTube Channel Tracker.app"
+```
+
+Then double-click the app as normal.
+
+**Option B — System Settings (no terminal)**
+
+1. Try to open the app — macOS will block it
+2. Open **System Settings → Privacy & Security**
+3. Scroll down to find the blocked app message
+4. Click **Open Anyway**
+
+You only need to do this once.
 
 ---
 
