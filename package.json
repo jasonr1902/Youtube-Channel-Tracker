@@ -1,6 +1,6 @@
 {
   "name": "youtube-channel-tracker",
-  "version": "0.1.1",
+  "version": "0.2.1",
   "description": "Organize, schedule, and track your YouTube channel production pipeline",
   "main": "./out/main/index.js",
   "scripts": {

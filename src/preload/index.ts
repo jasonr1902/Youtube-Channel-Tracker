@@ -119,6 +119,11 @@ const api = {
       const h = (_: Electron.IpcRendererEvent, info: { version: string }) => cb(info)
       ipcRenderer.on('update:downloaded', h)
       return () => ipcRenderer.off('update:downloaded', h)
+    },
+    onError: (cb: (message: string) => void): (() => void) => {
+      const h = (_: Electron.IpcRendererEvent, message: string) => cb(message)
+      ipcRenderer.on('update:error', h)
+      return () => ipcRenderer.off('update:error', h)
     }
   }
 }

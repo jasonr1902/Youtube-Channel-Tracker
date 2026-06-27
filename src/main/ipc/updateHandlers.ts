@@ -26,6 +26,10 @@ export function registerUpdateHandlers(): void {
   })
 
   ipcMain.handle('update:install', () => {
-    autoUpdater.quitAndInstall()
+    try {
+      autoUpdater.quitAndInstall(false, true)
+    } catch (err: unknown) {
+      send('update:error', err instanceof Error ? err.message : String(err))
+    }
   })
 }

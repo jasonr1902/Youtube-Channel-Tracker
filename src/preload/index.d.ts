@@ -98,6 +98,7 @@ declare global {
         onAvailable: (cb: (info: { version: string }) => void) => () => void
         onProgress: (cb: (pct: number) => void) => () => void
         onDownloaded: (cb: (info: { version: string }) => void) => () => void
+        onError: (cb: (message: string) => void) => () => void
       }
     }
   }
