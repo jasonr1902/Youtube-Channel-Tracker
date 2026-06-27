@@ -52,11 +52,13 @@ YouTube Channel Tracker replaces spreadsheets and sticky notes with a purpose-bu
 
 ### Step 3 — First launch (macOS security)
 
-Because the app isn't notarized yet, macOS will block it on first open.
+Because the app isn't notarized by Apple, macOS may say it's "damaged" or block it on first open. This is a Gatekeeper warning — the app is safe. Remove the quarantine flag with one Terminal command:
 
-1. **Right-click** the app in Applications and choose **Open**
-2. Click **Open** in the dialog that appears
-3. You only need to do this once — after that it opens normally
+```bash
+xattr -cr "/Applications/YouTube Channel Tracker.app"
+```
+
+Then double-click the app normally. You only need to do this once.
 
 ---
 
