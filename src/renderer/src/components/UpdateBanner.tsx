@@ -35,7 +35,8 @@ export default function UpdateBanner(): React.ReactElement | null {
   }
 
   return (
-    <div className="flex items-center justify-between px-4 py-2 bg-yt-elevated border-b border-yt-border text-sm flex-shrink-0">
+    <div className="flex items-center justify-between px-4 py-2 bg-yt-elevated border-b border-yt-border text-sm flex-shrink-0"
+      style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}>
       {state.phase === 'downloading' && (
         <>
           <span className="text-yt-muted">Downloading update v{state.version}…</span>
@@ -50,6 +51,7 @@ export default function UpdateBanner(): React.ReactElement | null {
           <button
             onClick={handleInstall}
             className="bg-yt-red hover:bg-red-600 text-white text-xs px-3 py-1 rounded transition-colors"
+            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
           >
             Restart &amp; Install
           </button>
@@ -61,7 +63,11 @@ export default function UpdateBanner(): React.ReactElement | null {
       {state.phase === 'error' && (
         <>
           <span className="text-red-400 text-xs truncate">Update error: {state.message}</span>
-          <button onClick={() => setState({ phase: 'idle' })} className="text-yt-muted hover:text-yt-text ml-4 flex-shrink-0">✕</button>
+          <button
+            onClick={() => setState({ phase: 'idle' })}
+            className="text-yt-muted hover:text-yt-text ml-4 flex-shrink-0"
+            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+          >✕</button>
         </>
       )}
     </div>
